@@ -5,14 +5,14 @@ build-backend = "hatchling.build"
 [project]
 name = "mcp2tcp"
 version = "0.1.0"
-description = "MCP Serial Service for PWM Control"
+description = "MCP TCP Service for PWM Control"
 readme = "README_PYPI.md"  # 使用PyPI专用README
 requires-python = ">=3.11"
 license = "MIT"
 authors = [
     { name = "MCP2Everything Team" }
 ]
-keywords = ["mcp", "serial", "pwm", "ai", "llm"]
+keywords = ["mcp", "tcp", "pwm", "ai", "llm"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
@@ -24,9 +24,9 @@ classifiers = [
     "Topic :: Scientific/Engineering",
 ]
 dependencies = [
-    "pyserial>=3.5",
     "mcp>=1.1.2",
     "pyyaml>=6.0.1",
+    "httpx>=0.28.1",
 ]
 
 [project.urls]

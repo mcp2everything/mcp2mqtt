@@ -5,12 +5,12 @@ tcp:
   connect_timeout: 3.0  # 连接超时时间，单位为秒
   receive_timeout: 2.0  # 接收超时时间，单位为秒
   communication_type: "client"  # 通信类型，client或server
-  response_start_string: "OK"  # 可选，串口应答的开始字符串，默认为OK
+  response_start_string: "CMD"  # 可选，串口应答的开始字符串，默认为OK
 
 commands:
   # PWM控制命令
   set_pwm:
-    command: "PWM {frequency}"  # 实际发送的命令格式，server会自动添加\r\n
+    command: "CMD_PWM {frequency}"  # 实际发送的命令格式，server会自动添加\r\n
     need_parse: false  # 不需要解析响应内容
     data_type: "ascii"  # 数据类型，ascii或hex
     prompts:
@@ -22,7 +22,7 @@ commands:
 
   # PICO信息查询命令
   get_pico_info:
-    command: "PICO_INFO"  # 实际发送的命令格式，server会自动添加\r\n
+    command: "CMD_PICO_INFO"  # 实际发送的命令格式，server会自动添加\r\n
     need_parse: true  # 需要解析响应内容
     data_type: "ascii"  # 数据类型，ascii或hex
     prompts:
@@ -31,7 +31,7 @@ commands:
 
   # LED控制命令示例
   led_control:
-    command: "LED {state}"  # state可以是on/off或其他值，server会自动添加\r\n
+    command: "CMD_LED {state}"  # state可以是on/off或其他值，server会自动添加\r\n
     need_parse: false
     data_type: "ascii"  # 数据类型，ascii或hex
     prompts:

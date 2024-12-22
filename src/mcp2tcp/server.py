@@ -57,6 +57,7 @@ class Command:
     """Configuration for a serial command."""
     command: str
     need_parse: bool
+    data_type: str  # 新增：数据类型
     prompts: List[str]
 
 @dataclass
@@ -64,12 +65,12 @@ class Config:
     """Configuration for mcp2tcp service."""
     remote_ip: Optional[str] = None
     port: int = 12345
-    connect_timeout: float = 5.0
-    receive_timeout: float = 5.0
-    baud_rate: int = 115200
+    connect_timeout: float = 3.0
+    receive_timeout: float = 3.0
     timeout: float = 1.0
     read_timeout: float = 1.0
     response_start_string: str = "OK"  # 新增：可配置的应答开始字符串
+    communication_type: str = "client"  # 新增：通信类型
     commands: Dict[str, Command] = field(default_factory=dict)
 
     @staticmethod
@@ -77,7 +78,6 @@ class Config:
         """Load configuration from YAML file."""
         # 获取配置文件名
         config_name = os.path.basename(config_path)
-        
         # 定义可能的配置文件位置
         config_paths = [
             config_path,  # 首先检查指定的路径
@@ -102,17 +102,13 @@ class Config:
                     
                     # Load TCP configuration
                     tcp_config = config_data.get('tcp', {})
-                    serial_config = config_data.get('serial', {})
                     config = Config(
                         remote_ip=tcp_config.get('remote_ip'),
                         port=tcp_config.get('port', 12345),
-                        connect_timeout=tcp_config.get('connect_timeout', 5.0),
-                        receive_timeout=tcp_config.get('receive_timeout', 5.0),
-                        # Load serial configuration
-                        baud_rate=serial_config.get('baud_rate', 115200),
-                        timeout=serial_config.get('timeout', 1.0),
-                        read_timeout=serial_config.get('read_timeout', 1.0),
-                        response_start_string=serial_config.get('response_start_string', 'OK')  # 新增：加载应答开始字符串
+                        connect_timeout=tcp_config.get('connect_timeout', 3.0),
+                        receive_timeout=tcp_config.get('receive_timeout', 3.0),
+                        response_start_string=tcp_config.get('response_start_string', 'OK'),  # 新增：加载应答开始字符串
+                        communication_type=tcp_config.get('communication_type', 'client')  # 新增：加载通信类型
                     )
 
                     # Load commands
@@ -123,6 +119,7 @@ class Config:
                         config.commands[cmd_id] = Command(
                             command=raw_command,
                             need_parse=cmd_data.get('need_parse', False),
+                            data_type=cmd_data.get('data_type', 'ascii'),  # 新增：加载数据类型
                             prompts=cmd_data.get('prompts', [])
                         )
                         logger.debug(f"Loaded command {cmd_id}: {repr(config.commands[cmd_id].command)}")
@@ -145,7 +142,7 @@ class TCPConnection:
         self.remote_ip: str = config.remote_ip
         self.port: int = config.port
         self.connect_timeout: float = config.connect_timeout
-        self.receive_timeout: float = config.receive_timeout
+        self.receive_timeout: float = config.receive_timeout * 5  # 增加接收超时时间
         self.response_start_string: str = config.response_start_string
 
     def connect(self) -> bool:
@@ -157,14 +154,13 @@ class TCPConnection:
                 (self.remote_ip, self.port), 
                 timeout=self.connect_timeout
             )
-            self.socket.settimeout(self.receive_timeout)
             logger.info(f"Connected to TCP server at {self.remote_ip}:{self.port}")
             return True
         except Exception as e:
             logger.error(f"Failed to connect to TCP server: {str(e)}")
             return False
 
-    def send_command(self, command: Command, arguments: Dict[str, Any]) -> list[types.TextContent]:
+    def send_command(self, command: Command, arguments: dict[str, Any] | None) -> list[types.TextContent]:
         """Send a command to the TCP server and return result according to MCP protocol."""
         try:
             if not self.socket:
@@ -173,20 +169,40 @@ class TCPConnection:
                         type="text",
                         text=f"Failed to connect to TCP server at {self.remote_ip}:{self.port}"
                     )]
+            if command.data_type == "ascii":
+                # 准备命令
+                cmd_str = command.command.format(**arguments)
+                # 确保命令以\r\n结尾
+                cmd_str = cmd_str.rstrip() + '\r\n'  # 移除可能的空白字符，强制添加\r\n
+                command_bytes = cmd_str.encode()
+                logger.info(f"Sending command: {cmd_str.strip()}")
+                logger.info(f"Sent command: {command_bytes.strip().decode('ascii')}")
+                self.socket.sendall(command_bytes)
 
-            cmd_str = command.command.format(**arguments)
-            cmd_str = cmd_str.rstrip() + '\r\n'
-            self.socket.sendall(cmd_str.encode())
-            logger.info(f"Sent command: {cmd_str.strip()}")
-
+            elif command.data_type == "hex":
+                command_bytes = bytes.fromhex(command.command.replace(" ", ""))
+                logger.info(f"Sent command: {command.command}")
+                self.socket.sendall(command_bytes)
+            self.socket.settimeout(self.receive_timeout)
             responses = []
             while True:
-                response = self.socket.recv(4096)
-                if not response:
-                    break
-                responses.append(response)
-                if response.endswith(b'\r\n'):
-                    break
+                try:
+                    response = self.socket.recv(4096)
+                    if response:
+                        logger.debug(f"Received data: {response}")
+                        responses.append(response)
+                        if command.data_type == "ascii" and response.endswith(b'\r\n'):
+                            break
+                        elif command.data_type == "hex":
+                            break
+                    else:
+                        break
+                except socket.timeout as e:
+                    logger.error(f"TCP receive timeout: {str(e)}")
+                    return [types.TextContent(
+                        type="text",
+                        text=f"TCP receive timeout: {str(e)}"
+                    )]
 
             if not responses:
                 return [types.TextContent(
@@ -198,14 +214,9 @@ class TCPConnection:
             logger.info(f"Received response: {first_response}")
 
             if self.response_start_string in first_response:
-                if command.need_parse:
-                    return [types.TextContent(
-                        type="text",
-                        text=first_response
-                    )]
                 return [types.TextContent(
                     type="text",
-                    text="Command executed successfully"
+                    text=first_response
                 )]
             else:
                 return [types.TextContent(
@@ -214,10 +225,10 @@ class TCPConnection:
                 )]
 
         except socket.timeout as e:
-            logger.error(f"TCP timeout: {str(e)}")
+            logger.error(f"TCP send timeout: {str(e)}")
             return [types.TextContent(
                 type="text",
-                text=f"TCP timeout: {str(e)}"
+                text=f"TCP send timeout: {str(e)}"
             )]
         except Exception as e:
             logger.error(f"TCP error: {str(e)}")
@@ -234,6 +245,12 @@ class TCPConnection:
             self.socket = None
 
 tcp_connection = TCPConnection()
+
+def send_command(command, arguments):
+    response = tcp_connection.send_command(command,arguments)
+    logger.info(f"Received response: {response}")
+    print(f"Received response: {response}")
+    return response
 
 @server.list_tools()
 async def handle_list_tools() -> list[types.Tool]:
@@ -294,18 +311,6 @@ async def handle_call_tool(name: str, arguments: dict[str, Any] | None) -> list[
             text=error_msg
         )]
 
-def load_config():
-    with open('config.yaml', 'r') as file:
-        config = yaml.safe_load(file)
-    return config
-
-def send_command(command, data_type):
-    if data_type == "hex":
-        command = bytes.fromhex(command.replace(" ", ""))
-    elif data_type == "ascii":
-        command = command.encode('ascii')
-    tcp_connection.send_command(command, {})
-
 async def main(config_name: str = None) -> None:
     """Run the MCP server.
     
@@ -324,20 +329,24 @@ async def main(config_name: str = None) -> None:
     # 加载配置
     global config
     config = Config.load(config_name)
-    
-    communication_type = config.communication_type
-    
-    # if communication_type == "client":
-    #     # ...existing code to handle client...
-    # elif communication_type == "server":
-    #     # ...code to handle server...
-
-    for cmd_name, cmd_info in config.commands.items():
-        command = cmd_info.command
-        data_type = cmd_info.data_type
-        send_command(command, data_type)
-        # ...existing code...
-
+    # communication_type = config.communication_type
+    # for command in config.commands.values():
+    #     logger.info(f"Loaded command: {command.command}")
+    #     if communication_type == "client":
+    #         pass
+    #     elif communication_type == "server":
+    #         pass
+    #     arguments = {}
+    #     # 判断字符串是否以 "PWM" 开头
+    #     if "PWM" in command.command:
+    #         # 示例参数
+    #         arguments = {"frequency": 1000}
+    #     if "LED" in command.command:
+    #         # 示例参数
+    #         arguments = {"state": 1}
+    #     # 发送命令
+    #     response = send_command(command, arguments)
+    #     print(response)
     try:
         async with mcp.server.stdio.stdio_server() as (read_stream, write_stream):
             await server.run(
@@ -357,6 +366,7 @@ async def main(config_name: str = None) -> None:
     finally:
         tcp_connection.close()
 
+# 示例调用
 if __name__ == "__main__":
     import sys
     config_name = sys.argv[1] if len(sys.argv) > 1 else None
