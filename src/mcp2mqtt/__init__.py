@@ -1,9 +1,9 @@
 # ====================================================
-# Project: mcp2tcp
+# Project: mcp2mqtt
 # Description: A protocol conversion tool that enables 
 #              hardware devices to communicate with 
 #              large language models (LLM) through serial ports.
-# Repository: https://github.com/mcp2everything/mcp2tcp.git
+# Repository: https://github.com/mcp2everything/mcp2mqtt.git
 # License: MIT License
 # Author: mcp2everything
 # Copyright (c) 2024 mcp2everything
@@ -34,7 +34,7 @@ import argparse
 
 def main():
     """Main entry point for the package."""
-    parser = argparse.ArgumentParser(description='mcp2tcp Server')
+    parser = argparse.ArgumentParser(description='mcp2mqtt Server')
     parser.add_argument('--config', 
                        default="default",
                        help='Configuration name (without _config.yaml suffix)')

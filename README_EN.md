@@ -1,12 +1,13 @@
-# MCP2Serial Service
+# mcp2mqtt: Bridge Between Physical World and AI Large Models
 
 English | [简体中文](README.md)
 
 <div align="center">
-    <img src="docs/images/logo.png" alt="MCP2Serial Logo" width="200"/>
+    <img src="docs/images/logo.png" alt="mcp2mqtt Logo" width="200"/>
+    <p>Control Hardware Through Natural Language, Opening a New Era of IoT</p>
 </div>
 
-MCP2Serial is a serial communication server based on the MCP service interface protocol, designed for communication with serial devices. It provides a simple configuration approach for defining and managing serial commands.
+mcp2mqtt is a serial communication server based on the MCP service interface protocol, designed for communication with serial devices. It provides a simple configuration approach for defining and managing serial commands.
 
 ## Features
 
@@ -20,20 +21,87 @@ MCP2Serial is a serial communication server based on the MCP service interface p
 - Compliant with Claude MCP protocol
 - Comprehensive error handling and status feedback
 - Cross-platform support (Windows, Linux, macOS)
+- **Smart MQTT Communication**
+  - Support for MQTT protocol publish/subscribe model
+  - Support for various MQTT servers (e.g., Mosquitto, EMQ X)
+  - QoS (Quality of Service) guarantee
+  - Topic filtering and message routing
+  - Real-time status monitoring and error handling
 
 ## System Architecture
 
 <div align="center">
-    <img src="docs/images/stru_eng.png" alt="System Architecture" width="800"/>
-    <p>MCP2Serial System Architecture</p>
+    <img src="docs/images/stru_en.png" alt="System Architecture" width="800"/>
+    <p>mcp2mqtt System Architecture</p>
 </div>
 
 ## Workflow
 
 <div align="center">
-    <img src="docs/images/workflow_eng.png" alt="Workflow Diagram" width="800"/>
-    <p>MCP2Serial Workflow Diagram</p>
+    <img src="docs/images/workflow_en.png" alt="Workflow" width="800"/>
+    <p>mcp2mqtt Workflow</p>
 </div>
+
+## Project Vision
+
+mcp2mqtt is a project that connects IoT devices with AI large models through Model Context Protocol (MCP) and MQTT protocol, achieving seamless integration between the physical world and AI models. The ultimate goals are:
+- Control your hardware devices using natural language
+- Real-time AI response and physical parameter adjustment
+- Enable your devices to understand and execute complex instructions
+- Enable device interconnection through MQTT protocol
+
+## Key Features
+
+- **MCP Protocol Integration**
+  - Complete support for Model Context Protocol
+  - Resource management and tool invocation support
+  - Flexible prompt system
+  - Command publishing and response through MQTT
+
+## Configuration Guide
+
+### MQTT Configuration
+```yaml
+mqtt:
+  broker: "localhost"  # MQTT server address
+  port: 1883  # MQTT server port
+  client_id: "mcp2mqtt_client"  # MQTT client ID
+  username: "mqtt_user"  # MQTT username
+  password: "mqtt_password"  # MQTT password
+  keepalive: 60  # Keep-alive time
+  topics:
+    command:
+      publish: "mcp/command"  # Command publishing topic
+      subscribe: "mcp/response"  # Response subscription topic
+    status:
+      publish: "mcp/status"  # Status publishing topic
+      subscribe: "mcp/control"  # Control command subscription topic
+```
+
+### Command Configuration
+```yaml
+commands:
+  set_pwm:
+    command: "CMD_PWM {frequency}"
+    need_parse: false
+    data_type: "ascii"
+    prompts:
+      - "Set PWM to maximum"
+      - "Set PWM to minimum"
+    mqtt_topic: "mcp/pwm"  # MQTT publish topic
+    response_topic: "mcp/pwm/response"  # MQTT response topic
+```
+
+## Supported Clients
+
+mcp2mqtt supports all clients implementing the MCP protocol and IoT devices supporting the MQTT protocol:
+
+| Client Type | Feature Support | Description |
+|------------|----------------|-------------|
+| Claude Desktop | Full Support | Recommended, supports all MCP features |
+| Continue | Full Support | Excellent development tool integration |
+| Cline | Resource + Tools | Supports multiple AI providers |
+| MQTT Devices | Pub/Sub | Supports all MQTT-compatible IoT devices |
 
 ## Quick Start
 
@@ -47,7 +115,7 @@ Claude Desktop or Cline+Vscode
 #### For Windows Users
 ```bash
 # Download the installation script
-curl -O https://raw.githubusercontent.com/mcp2everything/mcp2tcp/main/install.py
+curl -O https://raw.githubusercontent.com/mcp2everything/mcp2mqtt/main/install.py
 
 # Run the installation script
 python install.py
@@ -56,7 +124,7 @@ python install.py
 #### For macOS Users
 ```bash
 # Download the installation script
-curl -O https://raw.githubusercontent.com/mcp2everything/mcp2tcp/main/install_macos.py
+curl -O https://raw.githubusercontent.com/mcp2everything/mcp2mqtt/main/install_macos.py
 
 # Run the installation script
 python3 install_macos.py
@@ -65,7 +133,7 @@ python3 install_macos.py
 #### For Ubuntu/Raspberry Pi Users
 ```bash
 # Download the installation script
-curl -O https://raw.githubusercontent.com/mcp2everything/mcp2tcp/main/install_ubuntu.py
+curl -O https://raw.githubusercontent.com/mcp2everything/mcp2mqtt/main/install_ubuntu.py
 
 # Run the installation script
 python3 install_ubuntu.py
@@ -91,42 +159,42 @@ The configuration file (`config.yaml`) can be placed in different locations depe
 #### 2. User's Home Directory (Recommended for Personal Use)
 ```bash
 # Windows
-C:\Users\YourName\.mcp2tcp\config.yaml
+C:\Users\YourName\.mcp2mqtt\config.yaml
 
 # macOS
-/Users/YourName/.mcp2tcp/config.yaml
+/Users/YourName/.mcp2mqtt/config.yaml
 
 # Linux
-/home/username/.mcp2tcp/config.yaml
+/home/username/.mcp2mqtt/config.yaml
 ```
 - Best for: Personal configuration
-- Create the `.mcp2tcp` directory if it doesn't exist:
+- Create the `.mcp2mqtt` directory if it doesn't exist:
   ```bash
   # Windows (in Command Prompt)
-  mkdir "%USERPROFILE%\.mcp2tcp"
+  mkdir "%USERPROFILE%\.mcp2mqtt"
   
   # macOS/Linux
-  mkdir -p ~/.mcp2tcp
+  mkdir -p ~/.mcp2mqtt
   ```
 
 #### 3. System-wide Configuration (For Multi-user Setup)
 ```bash
 # Windows (requires admin rights)
-C:\ProgramData\mcp2tcp\config.yaml
+C:\ProgramData\mcp2mqtt\config.yaml
 
 # macOS/Linux (requires sudo/root)
-/etc/mcp2tcp/config.yaml
+/etc/mcp2mqtt/config.yaml
 ```
 - Best for: Shared configuration in multi-user environments
 - Create the directory with appropriate permissions:
   ```bash
   # Windows (as administrator)
-  mkdir "C:\ProgramData\mcp2tcp"
+  mkdir "C:\ProgramData\mcp2mqtt"
   
   # macOS/Linux (as root)
-  sudo mkdir -p /etc/mcp2tcp
-  sudo chown root:root /etc/mcp2tcp
-  sudo chmod 755 /etc/mcp2tcp
+  sudo mkdir -p /etc/mcp2mqtt
+  sudo chown root:root /etc/mcp2mqtt
+  sudo chmod 755 /etc/mcp2mqtt
   ```
 
 The program searches for the configuration file in this order and uses the first valid file it finds. Choose the location based on your needs:
@@ -151,16 +219,15 @@ commands:
       - "Set PWM to {value}%"
 ```
 
-
 3.MCP json Configuration
 Add the following to your MCP client (like Claude Desktop or Cline) configuration file, making sure to update the path to your actual installation path:
 
 ```json
 {
     "mcpServers": {
-        "mcp2tcp": {
+        "mcp2mqtt": {
             "command": "uvx",
-            "args": ["mcp2tcp"]
+            "args": ["mcp2mqtt"]
         }
     }
 }
@@ -169,13 +236,13 @@ if you want to develop locally, you can use the following configuration:
 ```json
 {
     "mcpServers": {
-        "mcp2tcp": {
+        "mcp2mqtt": {
             "command": "uv",
             "args": [
                 "--directory",
-                "your project path/mcp2tcp",  // ex: "C:/Users/Administrator/Documents/develop/my-mcp-server/mcp2tcp"
+                "your project path/mcp2mqtt",  // ex: "C:/Users/Administrator/Documents/develop/my-mcp-server/mcp2mqtt"
                 "run",
-                "mcp2tcp"
+                "mcp2mqtt"
             ]
         }
     }
@@ -263,8 +330,8 @@ Response example:
 #### Manual Installation
 ```bash
 # Install from source:
-git clone https://github.com/mcp2everything/mcp2tcp.git
-cd mcp2tcp
+git clone https://github.com/mcp2everything/mcp2mqtt.git
+cd mcp2mqtt
 
 # Create virtual environment
 uv venv .venv
@@ -284,11 +351,11 @@ uv pip install --editable .
 Use the `uv run` command to automatically build, install, and run the service:
 
 ```bash
-uv run src/mcp2tcp/server.py
+uv run src/mcp2mqtt/server.py
 ```
 
 This command will:
-1. Build the mcp2tcp package
+1. Build the mcp2mqtt package
 2. Install it in the current environment
 3. Start the server
 
@@ -321,71 +388,6 @@ Please make sure to update tests as appropriate.
 uv pytest tests/
 ```
 
-## Project Roadmap
-
-### Phase 1: Protocol Expansion
-- **Industrial Protocol Support**
-  - MODBUS RTU/TCP
-  - OPC UA
-  - MQTT
-  - CoAP
-  - TCP/IP Socket
-  
-- **Hardware Interface Extension**
-  - I2C
-  - SPI
-  - CAN
-  - 1-Wire
-  - GPIO
-
-### Phase 2: MCP2Anything Platform
-- **Unified Integration Platform**
-  - Visual Configuration Interface
-  - One-Click Protocol Activation
-  - Real-time Monitoring Dashboard
-  - Device Management System
-
-- **Intelligent Features**
-  - Protocol Auto-Detection
-  - Device Auto-Discovery
-  - Parameter Smart Optimization
-  - Anomaly Warning System
-
-### Phase 3: Ecosystem Development
-- **Plugin Marketplace**
-  - Protocol Plugins
-  - Device Drivers
-  - Custom Function Modules
-  - Community Contributions
-
-- **Cloud Service Integration**
-  - Device Cloud Management
-  - Remote Control
-  - Data Analytics
-  - AI Training Platform
-
-### Phase 4: Industry Solutions
-- **Vertical Domain Adaptation**
-  - Industrial Automation
-  - Smart Buildings
-  - Agricultural IoT
-  - Smart Cities
-
-- **Customization Services**
-  - Industry Protocol Adaptation
-  - Professional Technical Support
-  - Solution Consulting
-  - Training Services
-
-## Vision & Future
-
-MCP2Serial is revolutionizing IoT with:
-
-- **Protocol Unification**: Complete protocol support through MCP2Anything platform
-- **Plug and Play**: Zero-configuration setup with automatic discovery
-- **AI Empowerment**: Deep AI integration for intelligent decision-making
-- **Open Ecosystem**: Vibrant developer community and plugin marketplace
-
 ## License
 
 [MIT](LICENSE)
@@ -399,6 +401,6 @@ MCP2Serial is revolutionizing IoT with:
 ## Support
 
 If you encounter any issues or have questions:
-1. Check the [Issues](https://github.com/mcp2everything/mcp2tcp/issues) page
-2. Read our [Wiki](https://github.com/mcp2everything/mcp2tcp/wiki)
+1. Check the [Issues](https://github.com/mcp2everything/mcp2mqtt/issues) page
+2. Read our [Wiki](https://github.com/mcp2everything/mcp2mqtt/wiki)
 3. Create a new issue if needed

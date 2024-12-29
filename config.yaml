@@ -1,40 +1,84 @@
-tcp:
-  # TCP服务器配置
-  remote_ip: "127.0.0.1"  # 远端IP地址
-  port: 9999  # 端口号
-  connect_timeout: 3.0  # 连接超时时间，单位为秒
-  receive_timeout: 2.0  # 接收超时时间，单位为秒
-  communication_type: "client"  # 通信类型，client或server
-  response_start_string: "CMD"  # 可选，串口应答的开始字符串，默认为OK
+mqtt:
+  # MQTT服务器配置 - 使用EMQX公共测试服务器
+  broker: "broker.emqx.io"  # EMQX公共测试服务器地址
+  port: 1883  # TCP端口
+  websocket_port: 8083  # WebSocket端口
+  ssl_port: 8883  # SSL/TLS端口
+  ws_ssl_port: 8084  # WebSocket Secure端口
+  quic_port: 14567  # QUIC端口
+  client_id: "mcp2mqtt_test_client"  # 测试客户端ID
+  username: ""  # 公共测试服务器不需要认证
+  password: ""  # 公共测试服务器不需要认证
+  keepalive: 60
+  response_start_string: "CMD"  # 应答的开始字符串，用于验证响应
 
-commands:
-  # PWM控制命令
+# MCP工具定义
+tools:
   set_pwm:
-    command: "CMD_PWM {frequency}"  # 实际发送的命令格式，server会自动添加\r\n
-    need_parse: false  # 不需要解析响应内容
-    data_type: "ascii"  # 数据类型，ascii或hex
-    prompts:
-      - "把PWM调到最大"
-      - "把PWM调到最小"
-      - "请将PWM设置为{value}"
-      - "关闭PWM"
-      - "把PWM调到一半"
+    name: "set_pwm"
+    description: "设置PWM频率，范围0-100"
+    parameters:
+      - name: "frequency"
+        type: "integer"
+        description: "PWM频率值(0-100)"
+        required: true
+    mqtt_topic: "mcp2mqtt/pwm"
+    response_topic: "mcp2mqtt/pwm/response"
+    response_format: "CMD PWM {frequency} OK"
 
-  # PICO信息查询命令
   get_pico_info:
-    command: "CMD_PICO_INFO"  # 实际发送的命令格式，server会自动添加\r\n
-    need_parse: true  # 需要解析响应内容
-    data_type: "ascii"  # 数据类型，ascii或hex
-    prompts:
-      - "查询Pico板信息"
-      - "显示开发板状态"
+    name: "get_pico_info"
+    description: "获取Pico开发板信息"
+    parameters: []
+    mqtt_topic: "mcp2mqtt/info"
+    response_topic: "mcp2mqtt/info/response"
+    response_format: "CMD INFO {info} OK"
 
-  # LED控制命令示例
   led_control:
-    command: "CMD_LED {state}"  # state可以是on/off或其他值，server会自动添加\r\n
-    need_parse: false
-    data_type: "ascii"  # 数据类型，ascii或hex
+    name: "led_control"
+    description: "控制LED开关"
+    parameters:
+      - name: "state"
+        type: "string"
+        description: "LED状态(on/off)"
+        required: true
+        enum: ["on", "off"]
+    mqtt_topic: "mcp2mqtt/led"
+    response_topic: "mcp2mqtt/led/response"
+    response_format: "CMD LED {state} OK"
+
+# 命令示例（用于测试）
+commands:
+  set_pwm:
+    command: "PWM {frequency}"
+    need_parse: true
+    data_type: "ascii"
     prompts:
-      - "打开LED"
-      - "关闭LED"
-      - "设置LED状态为{state}"
+      - "把PWM调到最大"  # 返回 CMD PWM 100 OK
+      - "把PWM调到最小"  # 返回 CMD PWM 0 OK
+      - "请将PWM设置为{value}"  # 返回 CMD PWM {value} OK
+      - "关闭PWM"  # 返回 CMD PWM 0 OK
+      - "把PWM调到一半"  # 返回 CMD PWM 50 OK
+    mqtt_topic: "mcp2mqtt/pwm"
+    response_topic: "mcp2mqtt/pwm/response"
+
+  get_pico_info:
+    command: "INFO"
+    need_parse: true
+    data_type: "ascii"
+    prompts:
+      - "查询Pico板信息"  # 返回 CMD INFO {设备信息}
+      - "显示开发板状态"  # 返回 CMD INFO {设备信息}
+    mqtt_topic: "mcp2mqtt/info"
+    response_topic: "mcp2mqtt/info/response"
+
+  led_control:
+    command: "LED {state}"
+    need_parse: true
+    data_type: "ascii"
+    prompts:
+      - "打开LED"  # 返回 CMD LED on OK
+      - "关闭LED"  # 返回 CMD LED off OK
+      - "设置LED状态为{state}"  # 返回 CMD LED {state} OK
+    mqtt_topic: "mcp2mqtt/led"
+    response_topic: "mcp2mqtt/led/response"

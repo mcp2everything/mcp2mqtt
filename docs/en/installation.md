@@ -1,4 +1,4 @@
-# MCP2Serial Installation Guide
+# mcp2mqtt Installation Guide
 
 ## Requirements
 
@@ -11,7 +11,7 @@
 #### For Windows Users
 ```bash
 # Download the installation script
-curl -O https://raw.githubusercontent.com/mcp2everything/mcp2tcp/main/install.py
+curl -O https://raw.githubusercontent.com/mcp2everything/mcp2mqtt/main/install.py
 
 # Run the installation script
 python install.py
@@ -20,7 +20,7 @@ python install.py
 #### For MacOS Users
 ```bash
 # Download the installation script
-curl -O https://raw.githubusercontent.com/mcp2everything/mcp2tcp/main/install_macos.py
+curl -O https://raw.githubusercontent.com/mcp2everything/mcp2mqtt/main/install_macos.py
 
 # Run the installation script
 python3 install_macos.py
@@ -56,9 +56,9 @@ Add the following to your MCP client (like Claude Desktop or Cline) configuratio
 ```json
 {
     "mcpServers": {
-        "mcp2tcp": {
+        "mcp2mqtt": {
             "command": "uvx",
-            "args": ["mcp2tcp"]
+            "args": ["mcp2mqtt"]
         }
     }
 }
@@ -79,42 +79,42 @@ The configuration file (`config.yaml`) can be placed in different locations depe
 #### 2. User's Home Directory (Recommended for Personal Use)
 ```bash
 # Windows
-C:\Users\YourName\.mcp2tcp\config.yaml
+C:\Users\YourName\.mcp2mqtt\config.yaml
 
 # macOS
-/Users/YourName/.mcp2tcp/config.yaml
+/Users/YourName/.mcp2mqtt/config.yaml
 
 # Linux
-/home/username/.mcp2tcp/config.yaml
+/home/username/.mcp2mqtt/config.yaml
 ```
 - Best for: Personal configuration
-- Create the `.mcp2tcp` directory if it doesn't exist:
+- Create the `.mcp2mqtt` directory if it doesn't exist:
   ```bash
   # Windows (in Command Prompt)
-  mkdir "%USERPROFILE%\.mcp2tcp"
+  mkdir "%USERPROFILE%\.mcp2mqtt"
   
   # macOS/Linux
-  mkdir -p ~/.mcp2tcp
+  mkdir -p ~/.mcp2mqtt
   ```
 
 #### 3. System-wide Configuration (For Multi-user Setup)
 ```bash
 # Windows (requires admin rights)
-C:\ProgramData\mcp2tcp\config.yaml
+C:\ProgramData\mcp2mqtt\config.yaml
 
 # macOS/Linux (requires sudo/root)
-/etc/mcp2tcp/config.yaml
+/etc/mcp2mqtt/config.yaml
 ```
 - Best for: Shared configuration in multi-user environments
 - Create the directory with appropriate permissions:
   ```bash
   # Windows (as administrator)
-  mkdir "C:\ProgramData\mcp2tcp"
+  mkdir "C:\ProgramData\mcp2mqtt"
   
   # macOS/Linux (as root)
-  sudo mkdir -p /etc/mcp2tcp
-  sudo chown root:root /etc/mcp2tcp
-  sudo chmod 755 /etc/mcp2tcp
+  sudo mkdir -p /etc/mcp2mqtt
+  sudo chown root:root /etc/mcp2mqtt
+  sudo chmod 755 /etc/mcp2mqtt
   ```
 
 The program searches for the configuration file in this order and uses the first valid file it finds. Choose the location based on your needs:
@@ -141,9 +141,9 @@ When using MCP protocol-compatible clients (like Claude Desktop or Cline), add t
 ```json
 {
     "mcpServers": {
-        "mcp2tcp": {
+        "mcp2mqtt": {
             "command": "uvx",
-            "args": ["mcp2tcp"]
+            "args": ["mcp2mqtt"]
         }
     }
 }
@@ -152,13 +152,13 @@ if you want to develop locally, you can use the following configuration:
 ```json
 {
     "mcpServers": {
-        "mcp2tcp": {
+        "mcp2mqtt": {
             "command": "uv",
             "args": [
                 "--directory",
-                "your project path/mcp2tcp",  // ex: "C:/Users/Administrator/Documents/develop/my-mcp-server/mcp2tcp"
+                "your project path/mcp2mqtt",  // ex: "C:/Users/Administrator/Documents/develop/my-mcp-server/mcp2mqtt"
                 "run",
-                "mcp2tcp"
+                "mcp2mqtt"
             ]
         }
     }
@@ -185,14 +185,14 @@ if you want to develop locally, you can use the following configuration:
 
 ```bash
 # Clone the repository
-git clone https://github.com/mcp2everything/mcp2tcp.git
+git clone https://github.com/mcp2everything/mcp2mqtt.git
 ```
 
 2. Create and activate virtual environment:
 
 ```bash
 # Navigate to project directory
-cd mcp2tcp
+cd mcp2mqtt
 
 # Create virtual environment using uv
 uv venv .venv
@@ -208,13 +208,13 @@ uv pip install -r requirements.txt
 
 ```bash
 # Ensure you're in the project root
-cd mcp2tcp
+cd mcp2mqtt
 
 # Activate virtual environment (if not already activated)
 .venv\Scripts\activate
 
 # Run the server
-uv run src/mcp2tcp/server.py
+uv run src/mcp2mqtt/server.py
 ```
 
 ## Troubleshooting

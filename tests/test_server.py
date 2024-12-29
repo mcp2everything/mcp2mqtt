@@ -1,5 +1,5 @@
 import pytest
-from mcp2tcp.server import create_app
+from mcp2mqtt.server import create_app
 
 @pytest.fixture
 def app():

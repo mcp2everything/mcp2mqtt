@@ -1,8 +1,8 @@
-# MCP2Serial: Bridge between AI Models and Physical World
+# mcp2mqtt: Bridge between AI Models and Physical World
 
 Connect AI Large Language Models to hardware devices through the Model Context Protocol (MCP).
 
-[GitHub Repository](https://github.com/mcp2everything/mcp2tcp) | [Documentation](https://github.com/mcp2everything/mcp2tcp/tree/main/docs)
+[GitHub Repository](https://github.com/mcp2everything/mcp2mqtt) | [Documentation](https://github.com/mcp2everything/mcp2mqtt/tree/main/docs)
 
 ## Features
 
@@ -18,7 +18,7 @@ Connect AI Large Language Models to hardware devices through the Model Context P
 
 ## Supported Clients
 
-MCP2Serial supports all clients implementing the MCP protocol, including:
+mcp2mqtt supports all clients implementing the MCP protocol, including:
 
 - Claude Desktop (Test ok)
 - Continue (Should work)
@@ -40,9 +40,9 @@ Add the following to your MCP client configuration:
 ```json
 {
     "mcpServers": {
-        "mcp2tcp": {
+        "mcp2mqtt": {
             "command": "uvx",
-            "args": ["mcp2tcp"]
+            "args": ["mcp2mqtt"]
         }
     }
 }
@@ -73,16 +73,16 @@ The configuration file (`config.yaml`) can be placed in different locations depe
 - No special permissions required
 
 ### 2. User's Home Directory (Recommended for Personal Use)
-- Windows: `C:\Users\YourName\.mcp2tcp\config.yaml`
-- macOS: `/Users/YourName/.mcp2tcp/config.yaml`
-- Linux: `/home/username/.mcp2tcp/config.yaml`
+- Windows: `C:\Users\YourName\.mcp2mqtt\config.yaml`
+- macOS: `/Users/YourName/.mcp2mqtt/config.yaml`
+- Linux: `/home/username/.mcp2mqtt/config.yaml`
 - Best for: Personal configuration
-- Create the `.mcp2tcp` directory if it doesn't exist
+- Create the `.mcp2mqtt` directory if it doesn't exist
 - No special permissions required
 
 ### 3. System-wide Configuration (For Multi-user Setup)
-- Windows: `C:\ProgramData\mcp2tcp\config.yaml` (requires admin rights)
-- macOS/Linux: `/etc/mcp2tcp/config.yaml` (requires sudo/root)
+- Windows: `C:\ProgramData\mcp2mqtt\config.yaml` (requires admin rights)
+- macOS/Linux: `/etc/mcp2mqtt/config.yaml` (requires sudo/root)
 - Best for: Shared configuration in multi-user environments
 - Create the directory with appropriate permissions
 
@@ -149,13 +149,13 @@ commands:
 
 ## Documentation
 
-For detailed documentation, please visit our [GitHub repository](https://github.com/mcp2everything/mcp2tcp).
+For detailed documentation, please visit our [GitHub repository](https://github.com/mcp2everything/mcp2mqtt).
 
 ## Support
 
 If you encounter any issues or have questions:
-1. Check our [Issues](https://github.com/mcp2everything/mcp2tcp/issues) page
-2. Read our [Wiki](https://github.com/mcp2everything/mcp2tcp/wiki)
+1. Check our [Issues](https://github.com/mcp2everything/mcp2mqtt/issues) page
+2. Read our [Wiki](https://github.com/mcp2everything/mcp2mqtt/wiki)
 3. Create a new issue if needed
 
 ## License

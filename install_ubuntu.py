@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # ====================================================
-# Project: MCP2Serial
+# Project: mcp2mqtt
 # Description: Installation script for Ubuntu/Raspberry Pi
-# Repository: https://github.com/mcp2everything/mcp2tcp.git
+# Repository: https://github.com/mcp2everything/mcp2mqtt.git
 # License: MIT License
 # Author: mcp2everything
 # Copyright (c) 2024 mcp2everything
@@ -46,19 +46,19 @@ def install_uv():
         print(f"Error installing uv: {e}")
         return False
 
-def install_mcp2serial():
-    """Install mcp2tcp package."""
+def install_mcp2mqtt():
+    """Install mcp2mqtt package."""
     try:
         # 创建虚拟环境并安装包
         subprocess.run(['uv', 'venv', '.venv'], check=True)
-        subprocess.run(['.venv/bin/uv', 'pip', 'install', 'mcp2tcp'], check=True)
+        subprocess.run(['.venv/bin/uv', 'pip', 'install', 'mcp2mqtt'], check=True)
         return True
     except Exception as e:
-        print(f"Error installing mcp2tcp: {e}")
+        print(f"Error installing mcp2mqtt: {e}")
         return False
 
 def configure_claude_desktop():
-    """Configure Claude Desktop with mcp2tcp."""
+    """Configure Claude Desktop with mcp2mqtt."""
     try:
         home = str(Path.home())
         config_dir = os.path.join(home, '.config', 'claude-desktop')
@@ -67,9 +67,9 @@ def configure_claude_desktop():
         config_file = os.path.join(config_dir, 'config.json')
         config = {
             "mcpServers": {
-                "mcp2tcp": {
+                "mcp2mqtt": {
                     "command": "uvx",
-                    "args": ["mcp2tcp"]
+                    "args": ["mcp2mqtt"]
                 }
             }
         }
@@ -79,7 +79,7 @@ def configure_claude_desktop():
             with open(config_file, 'r') as f:
                 existing_config = json.load(f)
             existing_config.setdefault('mcpServers', {})
-            existing_config['mcpServers']['mcp2tcp'] = config['mcpServers']['mcp2tcp']
+            existing_config['mcpServers']['mcp2mqtt'] = config['mcpServers']['mcp2mqtt']
             config = existing_config
         
         with open(config_file, 'w') as f:
@@ -95,7 +95,7 @@ def setup_config():
     """Setup configuration files."""
     try:
         home = str(Path.home())
-        config_dir = os.path.join(home, '.mcp2tcp')
+        config_dir = os.path.join(home, '.mcp2mqtt')
         os.makedirs(config_dir, exist_ok=True)
         
         # 复制默认配置文件
@@ -112,7 +112,7 @@ def setup_config():
 
 def main():
     """Main installation process."""
-    print("Starting MCP2Serial installation for Ubuntu/Raspberry Pi...")
+    print("Starting mcp2mqtt installation for Ubuntu/Raspberry Pi...")
     
     # 检查Python版本
     if sys.version_info < (3, 11):
@@ -125,9 +125,9 @@ def main():
             print("Failed to install uv package manager")
             sys.exit(1)
     
-    # 安装mcp2serial
-    if not install_mcp2serial():
-        print("Failed to install mcp2tcp")
+    # 安装mcp2mqtt
+    if not install_mcp2mqtt():
+        print("Failed to install mcp2mqtt")
         sys.exit(1)
     
     # 配置Claude Desktop
@@ -139,12 +139,12 @@ def main():
         print("Warning: Failed to setup configuration files")
     
     print("\nInstallation completed!")
-    print("\nTo use mcp2tcp:")
+    print("\nTo use mcp2mqtt:")
     print("1. Activate the virtual environment:")
     print("   source .venv/bin/activate")
     print("2. Run the server:")
-    print("   uv run mcp2tcp")
-    print("\nFor more information, visit: https://github.com/mcp2everything/mcp2tcp")
+    print("   uv run mcp2mqtt")
+    print("\nFor more information, visit: https://github.com/mcp2everything/mcp2mqtt")
 
 if __name__ == "__main__":
     main()

@@ -61,7 +61,7 @@ def check_and_install_uv():
 
 def create_config():
     """创建默认配置文件"""
-    config_dir = Path.home() / ".mcp2tcp"
+    config_dir = Path.home() / ".mcp2mqtt"
     config_file = config_dir / "config.yaml"
     
     if not config_dir.exists():
@@ -109,16 +109,16 @@ def check_and_configure_claude():
     if "mcpServers" not in config:
         config["mcpServers"] = {}
 
-    if "mcp2tcp" not in config["mcpServers"]:
-        config["mcpServers"]["mcp2tcp"] = {
+    if "mcp2mqtt" not in config["mcpServers"]:
+        config["mcpServers"]["mcp2mqtt"] = {
             "command": "uvx",
-            "args": ["mcp2tcp"]
+            "args": ["mcp2mqtt"]
         }
         with open(config_file, 'w', encoding='utf-8') as f:
             json.dump(config, f, indent=2)
-        print("✅ 已添加mcp2serial配置到Claude")
+        print("✅ 已添加mcp2mqtt配置到Claude")
     else:
-        print("ℹ️ Claude已配置mcp2serial")
+        print("ℹ️ Claude已配置mcp2mqtt")
 
 def check_vscode():
     """检查VSCode安装"""
@@ -128,9 +128,9 @@ def check_vscode():
 ℹ️ 检测到VSCode安装
 请在VSCode中添加以下MCP服务器配置：
 {
-    "mcp2tcp": {
+    "mcp2mqtt": {
         "command": "uvx",
-        "args": ["mcp2tcp"]
+        "args": ["mcp2mqtt"]
     }
 }
 """)
@@ -155,7 +155,7 @@ def check_serial_devices():
         print("- FTDI: https://ftdichip.com/drivers/vcp-drivers/")
 
 def main():
-    print("=== MCP2Serial MacOS 安装程序 ===")
+    print("=== mcp2mqtt MacOS 安装程序 ===")
     
     # 1. 检查操作系统
     system = check_os()
@@ -187,7 +187,7 @@ def main():
     print("2. 检查Claude或VSCode的MCP服务器配置")
     print("3. 重启Claude或VSCode以使配置生效")
     print("\n💡 提示：")
-    print("- mcp2tcp 将在首次运行时自动下载")
+    print("- mcp2mqtt 将在首次运行时自动下载")
     print("- 串口设备名通常为 /dev/tty.usbserial-* 格式")
     print("- 如遇到权限问题，请确保当前用户有串口设备的读写权限")
 

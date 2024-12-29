@@ -1,9 +1,9 @@
-# MCP2Serial: 连接物理世界与AI大模型的桥梁 
+# mcp2mqtt: 连接物理世界与AI大模型的桥梁 
 
 [English](README_EN.md) | 简体中文
 
 <div align="center">
-    <img src="docs/images/logo.png" alt="MCP2Serial Logo" width="200"/>
+    <img src="docs/images/logo.png" alt="mcp2mqtt Logo" width="200"/>
     <p>通过自然语言控制硬件，开启物联网新纪元</p>
 </div>
 
@@ -11,83 +11,127 @@
 
 <div align="center">
     <img src="docs/images/stru_chs.png" alt="系统架构图" width="800"/>
-    <p>MCP2Serial 系统架构图</p>
+    <p>mcp2mqtt 系统架构图</p>
 </div>
 
 ## 工作流程
 
 <div align="center">
     <img src="docs/images/workflow_chs.png" alt="工作流程图" width="800"/>
-    <p>MCP2Serial 工作流程图</p>
+    <p>mcp2mqtt 工作流程图</p>
 </div>
 
 ## 项目愿景
 
-MCP2Serial 将串口设备接入AI大模型的项目，它通过 Model Context Protocol (MCP) 将物理世界与 AI 大模型无缝连接。最终实现：
+mcp2mqtt 是一个将物联网设备接入AI大模型的项目，它通过 Model Context Protocol (MCP) 和 MQTT 协议将物理世界与 AI 大模型无缝连接。最终实现：
 - 用自然语言控制你的硬件设备
 - AI 实时响应并调整物理参数
 - 让你的设备具备理解和执行复杂指令的能力
+- 通过MQTT协议实现设备间的互联互通
 
 ## 主要特性
 
-- **智能串口通信**
-  - 自动检测和配置串口设备 用户也可指定串口号
-  - 支持多种波特率（默认 115200）
+- **智能MQTT通信**
+  - 支持MQTT协议的发布/订阅模式
+  - 支持多种MQTT服务器（如Mosquitto、EMQ X等）
+  - 支持QoS服务质量保证
+  - 支持主题过滤和消息路由
   - 实时状态监控和错误处理
 
 - **MCP 协议集成**
   - 完整支持 Model Context Protocol
   - 支持资源管理和工具调用
   - 灵活的提示词系统
+  - 通过MQTT实现命令的发布与响应
+
+## 配置说明
+
+### MQTT配置
+```yaml
+mqtt:
+  broker: "localhost"  # MQTT服务器地址
+  port: 1883  # MQTT服务器端口
+  client_id: "mcp2mqtt_client"  # MQTT客户端ID
+  username: "mqtt_user"  # MQTT用户名
+  password: "mqtt_password"  # MQTT密码
+  keepalive: 60  # 保持连接时间
+  topics:
+    command:
+      publish: "mcp/command"  # 发送命令的主题
+      subscribe: "mcp/response"  # 接收响应的主题
+    status:
+      publish: "mcp/status"  # 发送状态的主题
+      subscribe: "mcp/control"  # 接收控制命令的主题
+```
+
+### 命令配置
+```yaml
+commands:
+  set_pwm:
+    command: "CMD_PWM {frequency}"
+    need_parse: false
+    data_type: "ascii"
+    prompts:
+      - "把PWM调到最大"
+      - "把PWM调到最小"
+    mqtt_topic: "mcp/pwm"  # MQTT发布主题
+    response_topic: "mcp/pwm/response"  # MQTT响应主题
+```
+
+## MQTT 命令和响应
+
+### 命令格式
+
+命令使用简单的文本格式：
+
+1. PWM 控制：
+   - 命令：`PWM {值}`
+   - 示例：
+     - `PWM 100`（最大值）
+     - `PWM 0`（关闭）
+     - `PWM 50`（50%）
+   - 响应：`CMD PWM {值} OK`
+
+2. LED 控制：
+   - 命令：`LED {状态}`
+   - 示例：
+     - `LED on`（打开）
+     - `LED off`（关闭）
+   - 响应：`CMD LED {状态} OK`
+
+3. 设备信息：
+   - 命令：`INFO`
+   - 响应：`CMD INFO {设备信息}`
+
+### 错误响应
+
+如果发生错误，响应格式将为：
+`ERROR: {错误信息}`
 
 ## 支持的客户端
 
-MCP2Serial 支持所有实现了 MCP 协议的客户端，包括：
+mcp2mqtt 支持所有实现了 MCP 协议的客户端，以及支持MQTT协议的物联网设备：
 
-| 客户端 | 特性支持 | 说明 |
+| 客户端类型 | 特性支持 | 说明 |
 |--------|----------|------|
 | Claude Desktop | 完整支持 | 推荐使用，支持所有 MCP 功能 |
 | Continue | 完整支持 | 优秀的开发工具集成 |
 | Cline | 资源+工具 | 支持多种 AI 提供商 |
-| Zed | 基础支持 | 支持提示词命令 |
-| Sourcegraph Cody | 资源支持 | 通过 OpenCTX 集成 |
-| Firebase Genkit | 部分支持 | 支持资源列表和工具 |
-
-## 支持的 AI 模型
-
-得益于灵活的客户端支持，MCP2Serial 可以与多种 AI 模型协同工作：
-
-### 云端模型
-- OpenAI (GPT-4, GPT-3.5)
-- Anthropic Claude
-- Google Gemini
-- AWS Bedrock
-- Azure OpenAI
-- Google Cloud Vertex AI
-
-### 本地模型
-- LM Studio 支持的所有模型
-- Ollama 支持的所有模型
-- 任何兼容 OpenAI API 的模型
-
-### 准备
-Python3.11 或更高版本
-Claude Desktop 或 Cline
-
+| MQTT设备 | 发布/订阅 | 支持所有MQTT协议的物联网设备 |
 
 ## 快速开始
 
 ### 1. 安装
 
 #### Windows用户
-下载 [install.py](https://raw.githubusercontent.com/mcp2everything/mcp2tcp/main/install.py) 
+下载 [install.py](https://raw.githubusercontent.com/mcp2everything/mcp2mqtt/main/install.py) 
 ```bash
 python install.py
 ```
 #### macOS用户
 ```bash
 # 下载安装脚本
-curl -O https://raw.githubusercontent.com/mcp2everything/mcp2tcp/main/install_macos.py
+curl -O https://raw.githubusercontent.com/mcp2everything/mcp2mqtt/main/install_macos.py
 
 # 运行安装脚本
 python3 install_macos.py
@@ -96,7 +140,7 @@ python3 install_macos.py
 #### Ubuntu/Raspberry Pi用户
 ```bash
 # 下载安装脚本
-curl -O https://raw.githubusercontent.com/mcp2everything/mcp2tcp/main/install_ubuntu.py
+curl -O https://raw.githubusercontent.com/mcp2everything/mcp2mqtt/main/install_ubuntu.py
 
 # 运行安装脚本
 python3 install_ubuntu.py
@@ -125,35 +169,16 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 ```json
 {
     "mcpServers": {
-        "mcp2tcp": {
+        "mcp2mqtt": {
             "command": "uvx",
             "args": [
-                "mcp2tcp"
+                "mcp2mqtt"
             ]
         }
     }
 }
 ```
 > 注意：修改配置后需要重启Cline或者Claude客户端软件
-
-配置串口和命令：
-注意下面的配置默认为COM11 需要根据实际进行修改
-```yaml
-# config.yaml
-serial:
-  port: COM11  # 或自动检测
-  baud_rate: 115200  # 可选，默认 115200
-  timeout: 1.0  # 可选，默认 1.0
-  read_timeout: 1.0  # 读取超时时间，1秒内不应答则报错
-  response_start_string: OK  # 可选，串口应答的开始字符串，默认为OK
-
-commands:
-  set_pwm:
-    command: "PWM {frequency}\n"
-    need_parse: false
-    prompts:
-      - "把PWM调到{value}"
-```
 ## 配置说明
 ### 配置文件位置
 
@@ -161,55 +186,28 @@ commands:
 用户主目录（推荐个人使用）
 ```bash
 # Windows系统
-C:\Users\用户名\.mcp2tcp\config.yaml
+C:\Users\用户名\.mcp2mqtt\config.yaml
 
 # macOS系统
-/Users/用户名/.mcp2tcp/config.yaml
+/Users/用户名/.mcp2mqtt/config.yaml
 
 # Linux系统
-/home/用户名/.mcp2tcp/config.yaml
+/home/用户名/.mcp2mqtt/config.yaml
 ```
 - 适用场景：个人配置
-- 需要创建 `.mcp2tcp` 目录：
+- 需要创建 `.mcp2mqtt` 目录：
   ```bash
   # Windows系统（在命令提示符中）
-  mkdir "%USERPROFILE%\.mcp2tcp"
+  mkdir "%USERPROFILE%\.mcp2mqtt"
   
   # macOS/Linux系统
-  mkdir -p ~/.mcp2tcp
+  mkdir -p ~/.mcp2mqtt
   ```
 
 ### 串口配置 命令配置进阶
 在 `config.yaml` 中添加自定义命令：
 
 
-使用真实串口
-```yaml
-# config.yaml
-serial:
-  port: COM11  # 或自动检测
-  baud_rate: 115200  # 可选，默认 115200
-  timeout: 1.0  # 可选，默认 1.0
-  read_timeout: 1.0  # 读取超时时间，1秒内不应答则报错
-  response_start_string: OK  # 可选，串口应答的开始字符串，默认为OK
-
-commands:
-  set_pwm:
-    command: "PWM {frequency}\n"
-    need_parse: false
-    prompts:
-      - "把PWM调到{value}"
-```
-
-使用模拟串口
-```yaml
-serial:
-  # 串口配置
-  port: LOOP_BACK  # 可选，如果不指定则自动查找。设置为LOOP_BACK时启用回环模式，发送什么就接收什么
-  baud_rate: 115200  # 可选，默认 115200
-  timeout: 1.0  # 可选，默认 1.0
-  read_timeout: 1.0  # 读取超时时间，1秒内不应答则报错
-  response_start_string: CMD  # 可选，串口应答的开始字符串，默认为OK
 
 commands:
   # PWM控制命令
@@ -229,10 +227,10 @@ commands:
 ```json
 {
     "mcpServers": {
-        "mcp2tcp": {
+        "mcp2mqtt": {
             "command": "uvx",
             "args": [
-                "mcp2tcp",
+                "mcp2mqtt",
                 "--config",
                 "Pico"  //指定配置文件名，不需要添加_config.yaml后缀
             ]
@@ -240,16 +238,16 @@ commands:
     }
 }
 ```
-为了能使用多个串口，我们可以新增多个mcp2serial的服务 指定不同的配置文件名即可。
+为了能使用多个串口，我们可以新增多个mcp2mqtt的服务 指定不同的配置文件名即可。
 如果要接入多个设备，如有要连接第二个设备：
 指定加载Pico2配置文件：Pico2_config.yaml
 ```json
 {
     "mcpServers": {
-        "mcp2serial2": {
+        "mcp2mqtt2": {
             "command": "uvx",
             "args": [
-                "mcp2tcp",
+                "mcp2mqtt",
                 "--config",
                 "Pico2"  //指定配置文件名，不需要添加_config.yaml后缀
             ]
@@ -288,8 +286,8 @@ firmware可以在项目仓库中下载，目前演示的是Pico的micropython代
 1. 从源码安装
 ```bash
 # 通过源码安装：
-git clone https://github.com/mcp2everything/mcp2tcp.git
-cd mcp2tcp
+git clone https://github.com/mcp2everything/mcp2mqtt.git
+cd mcp2mqtt
 
 # 创建虚拟环境
 uv venv .venv
@@ -312,14 +310,6 @@ uv pip install --editable .
 比如发送LED_ON
 那么应答起始符也是LED_ON
 ```yaml
-serial:
-  # 串口配置
-  port: LOOP_BACK  # 可选，如果不指定则自动查找。设置为LOOP_BACK时启用回环模式，发送什么就接收什么
-  baud_rate: 115200  # 可选，默认 115200
-  timeout: 1.0  # 可选，默认 1.0
-  read_timeout: 1.0  # 读取超时时间，1秒内不应答则报错
-  response_start_string: CMD  # 可选，串口应答的开始字符串，默认为OK
-
 commands:
   # PWM控制命令
   set_pwm:
@@ -335,14 +325,6 @@ commands:
 
 如果使用真实串口
 ```yaml
-# config.yaml
-serial:
-  port: COM11  # 或自动检测
-  baud_rate: 115200  # 可选，默认 115200
-  timeout: 1.0  # 可选，默认 1.0
-  read_timeout: 1.0  # 读取超时时间，1秒内不应答则报错
-  response_start_string: OK  # 可选，串口应答的开始字符串，默认为OK
-
 commands:
   set_pwm:
     command: "PWM {frequency}\n"
@@ -362,13 +344,13 @@ commands:
 ```json
 {
     "mcpServers": {
-        "mcp2tcp": {
+        "mcp2mqtt": {
             "command": "uv",
             "args": [
                 "--directory",
-                "你的实际路径/mcp2tcp",  // 例如: "C:/Users/Administrator/Documents/develop/my-mcp-server/mcp2tcp"
+                "你的实际路径/mcp2mqtt",  // 例如: "C:/Users/Administrator/Documents/develop/my-mcp-server/mcp2mqtt"
                 "run",
-                "mcp2tcp"
+                "mcp2mqtt"
             ]
         }
     }
@@ -378,13 +360,13 @@ commands:
 ```json
 {
     "mcpServers": {
-        "mcp2tcp": {
+        "mcp2mqtt": {
             "command": "uv",
             "args": [
                 "--directory",
-                "你的实际路径/mcp2tcp",  // 例如: "C:/Users/Administrator/Documents/develop/my-mcp-server/mcp2tcp"
+                "你的实际路径/mcp2mqtt",  // 例如: "C:/Users/Administrator/Documents/develop/my-mcp-server/mcp2mqtt"
                 "run",
-                "mcp2tcp",
+                "mcp2mqtt",
                 "--config", // 可选参数，指定配置文件名
                 "Pico"  // 可选参数，指定配置文件名，不需要添加_config.yaml后缀
             ]
@@ -404,42 +386,42 @@ commands:
 #### 2. 用户主目录（推荐个人使用）
 ```bash
 # Windows系统
-C:\Users\用户名\.mcp2tcp\config.yaml
+C:\Users\用户名\.mcp2mqtt\config.yaml
 
 # macOS系统
-/Users/用户名/.mcp2tcp/config.yaml
+/Users/用户名/.mcp2mqtt/config.yaml
 
 # Linux系统
-/home/用户名/.mcp2tcp/config.yaml
+/home/用户名/.mcp2mqtt/config.yaml
 ```
 - 适用场景：个人配置
-- 需要创建 `.mcp2tcp` 目录：
+- 需要创建 `.mcp2mqtt` 目录：
   ```bash
   # Windows系统（在命令提示符中）
-  mkdir "%USERPROFILE%\.mcp2tcp"
+  mkdir "%USERPROFILE%\.mcp2mqtt"
   
   # macOS/Linux系统
-  mkdir -p ~/.mcp2tcp
+  mkdir -p ~/.mcp2mqtt
   ```
 
 #### 3. 系统级配置（适合多用户环境）
 ```bash
 # Windows系统（需要管理员权限）
-C:\ProgramData\mcp2tcp\config.yaml
+C:\ProgramData\mcp2mqtt\config.yaml
 
 # macOS/Linux系统（需要root权限）
-/etc/mcp2tcp/config.yaml
+/etc/mcp2mqtt/config.yaml
 ```
 - 适用场景：多用户共享配置
 - 创建目录并设置权限：
   ```bash
   # Windows系统（以管理员身份运行）
-  mkdir "C:\ProgramData\mcp2tcp"
+  mkdir "C:\ProgramData\mcp2mqtt"
   
   # macOS/Linux系统（以root身份运行）
-  sudo mkdir -p /etc/mcp2tcp
-  sudo chown root:root /etc/mcp2tcp
-  sudo chmod 755 /etc/mcp2tcp
+  sudo mkdir -p /etc/mcp2mqtt
+  sudo chown root:root /etc/mcp2mqtt
+  sudo chmod 755 /etc/mcp2mqtt
   ```
 
 程序会按照上述顺序查找配置文件，使用找到的第一个有效配置文件。根据你的需求选择合适的位置：
@@ -453,13 +435,13 @@ C:\ProgramData\mcp2tcp\config.yaml
 .venv\Scripts\activate
 
 # 运行服务器（使用默认配置config.yaml 案例中用的LOOP_BACK 模拟串口，无需真实串口和串口设备）
-uv run src/mcp2tcp/server.py
+uv run src/mcp2mqtt/server.py
 或
-uv run mcp2tcp
+uv run mcp2mqtt
 # 运行服务器（使用指定配置Pico_config.yaml）
-uv run src/mcp2tcp/server.py --config Pico
+uv run src/mcp2mqtt/server.py --config Pico
 或
-uv run mcp2tcp --config Pico
+uv run mcp2mqtt --config Pico
 ```
 
 
@@ -468,111 +450,3 @@ uv run mcp2tcp --config Pico
 - [安装指南](./docs/zh/installation.md)
 - [API文档](./docs/zh/api.md)
 - [配置说明](./docs/zh/configuration.md)
-
-
-## 应用场景
-
-1. **智能家居自动化**
-   - 通过自然语言控制灯光、风扇等设备
-   - AI 根据环境自动调节设备参数
-
-2. **工业自动化**
-   - 智能控制生产线设备
-   - 实时监控和调整工艺参数
-
-3. **教育和研究**
-   - 物联网教学演示
-   - 硬件控制实验平台
-
-4. **原型开发**
-   - 快速验证硬件控制方案
-   - 简化开发流程
-
-## 🚀 项目发展规划
-
-### 第一阶段：协议扩展
-- **工业协议支持**
-  - MODBUS RTU/TCP
-  - OPC UA
-  - MQTT
-  - CoAP
-  - TCP/IP Socket
-  
-- **硬件接口扩展**
-  - I2C
-  - SPI
-  - CAN
-  - 1-Wire
-  - GPIO
-
-### 第二阶段：MCP2Anything 平台
-- **统一集成平台**
-  - 可视化配置界面
-  - 一键启用各类协议
-  - 实时监控仪表盘
-  - 设备管理系统
-
-- **智能功能**
-  - 协议自动检测
-  - 设备自动发现
-  - 参数智能优化
-  - 异常预警系统
-
-### 第三阶段：生态系统建设
-- **插件市场**
-  - 协议插件
-  - 设备驱动
-  - 自定义功能模块
-  - 社区贡献集成
-
-- **云服务集成**
-  - 设备云管理
-  - 远程控制
-  - 数据分析
-  - AI 训练平台
-
-### 第四阶段：行业解决方案
-- **垂直领域适配**
-  - 工业自动化
-  - 智能建筑
-  - 农业物联网
-  - 智慧城市
-
-- **定制化服务**
-  - 行业协议适配
-  - 专业技术支持
-  - 解决方案咨询
-  - 培训服务
-
-## 🔮 愿景展望
-
-MCP2Serial 正在开启物联网的新篇章：
-
-- **协议统一**: 通过 MCP2Anything 平台实现全协议支持
-- **即插即用**: 一键配置，自动发现，零门槛使用
-- **AI 赋能**: 深度集成 AI 能力，实现智能决策
-- **开放生态**: 建立活跃的开发者社区和插件市场
-
-## 未来展望
-
-MCP2Serial 正在开启物联网的新篇章：
-
-- **多协议支持**: 计划支持更多通信协议（I2C、SPI等）
-- **设备生态**: 建立开放的设备支持生态系统
-- **AI 增强**: 集成更多 AI 能力，提供更智能的控制逻辑
-- **可视化**: 开发直观的监控和配置界面
-
-## 相关资源
-
-- [MCP 协议规范](https://modelcontextprotocol.io/)
-- [项目文档](docs/)
-- [示例代码](examples/)
-- [常见问题](docs/FAQ.md)
-
-## 参与贡献
-
-我们欢迎各种形式的贡献，无论是新功能、文档改进还是问题报告。查看 [贡献指南](CONTRIBUTING.md) 了解更多信息。
-
-## 许可证
-
-本项目采用 MIT 许可证 - 详见 [LICENSE](LICENSE) 文件

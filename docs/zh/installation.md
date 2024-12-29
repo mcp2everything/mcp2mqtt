@@ -1,4 +1,4 @@
-# mcp2tcp 安装指南
+# mcp2mqtt 安装指南
 
 ## 环境要求
 
@@ -11,7 +11,7 @@
 #### Windows用户
 ```bash
 # 下载安装脚本
-curl -O https://raw.githubusercontent.com/mcp2everything/mcp2tcp/main/install.py
+curl -O https://raw.githubusercontent.com/mcp2everything/mcp2mqtt/main/install.py
 
 # 运行安装脚本
 python install.py
@@ -20,7 +20,7 @@ python install.py
 #### MacOS用户
 ```bash
 # 下载安装脚本
-curl -O https://raw.githubusercontent.com/mcp2everything/mcp2tcp/main/install_macos.py
+curl -O https://raw.githubusercontent.com/mcp2everything/mcp2mqtt/main/install_macos.py
 
 # 运行安装脚本
 python3 install_macos.py
@@ -29,7 +29,7 @@ python3 install_macos.py
 #### Ubuntu/Raspberry Pi用户
 ```bash
 # 下载安装脚本
-curl -O https://raw.githubusercontent.com/mcp2everything/mcp2tcp/main/install_ubuntu.py
+curl -O https://raw.githubusercontent.com/mcp2everything/mcp2mqtt/main/install_ubuntu.py
 
 # 运行安装脚本
 python3 install_ubuntu.py
@@ -64,17 +64,17 @@ python3 install_ubuntu.py
    - Windows: `.venv\Scripts\activate`
    - macOS/Linux: `source .venv/bin/activate`
 
-5. 安装 mcp2serial：
+5. 安装 mcp2mqtt：
    ```bash
-   uv pip install mcp2tcp
+   uv pip install mcp2mqtt
    ```
 
 ### 方式二：通过源码安装
 
 1. 克隆仓库：
    ```bash
-   git clone https://github.com/mcp2everything/mcp2tcp.git
-   cd mcp2tcp
+   git clone https://github.com/mcp2everything/mcp2mqtt.git
+   cd mcp2mqtt
    ```
 
 2. 创建虚拟环境：
@@ -106,42 +106,42 @@ python3 install_ubuntu.py
 #### 2. 用户主目录（推荐个人使用）
 ```bash
 # Windows系统
-C:\Users\用户名\.mcp2tcp\config.yaml
+C:\Users\用户名\.mcp2mqtt\config.yaml
 
 # macOS系统
-/Users/用户名/.mcp2tcp/config.yaml
+/Users/用户名/.mcp2mqtt/config.yaml
 
 # Linux系统
-/home/用户名/.mcp2tcp/config.yaml
+/home/用户名/.mcp2mqtt/config.yaml
 ```
 - 适用场景：个人配置
-- 需要创建 `.mcp2tcp` 目录：
+- 需要创建 `.mcp2mqtt` 目录：
   ```bash
   # Windows系统（在命令提示符中）
-  mkdir "%USERPROFILE%\.mcp2tcp"
+  mkdir "%USERPROFILE%\.mcp2mqtt"
   
   # macOS/Linux系统
-  mkdir -p ~/.mcp2tcp
+  mkdir -p ~/.mcp2mqtt
   ```
 
 #### 3. 系统级配置（适合多用户环境）
 ```bash
 # Windows系统（需要管理员权限）
-C:\ProgramData\mcp2tcp\config.yaml
+C:\ProgramData\mcp2mqtt\config.yaml
 
 # macOS/Linux系统（需要root权限）
-/etc/mcp2tcp/config.yaml
+/etc/mcp2mqtt/config.yaml
 ```
 - 适用场景：多用户共享配置
 - 创建目录并设置权限：
   ```bash
   # Windows系统（以管理员身份运行）
-  mkdir "C:\ProgramData\mcp2tcp"
+  mkdir "C:\ProgramData\mcp2mqtt"
   
   # macOS/Linux系统（以root身份运行）
-  sudo mkdir -p /etc/mcp2tcp
-  sudo chown root:root /etc/mcp2tcp
-  sudo chmod 755 /etc/mcp2tcp
+  sudo mkdir -p /etc/mcp2mqtt
+  sudo chown root:root /etc/mcp2mqtt
+  sudo chmod 755 /etc/mcp2mqtt
   ```
 
 程序会按照上述顺序查找配置文件，使用找到的第一个有效配置文件。根据你的需求选择合适的位置：
@@ -220,9 +220,9 @@ commands:
 ```json
 {
     "mcpServers": {
-        "mcp2tcp": {
+        "mcp2mqtt": {
             "command": "uvx",
-            "args": ["mcp2tcp"]
+            "args": ["mcp2mqtt"]
         }
     }
 }
@@ -232,13 +232,13 @@ commands:
 ```json
 {
     "mcpServers": {
-        "mcp2tcp": {
+        "mcp2mqtt": {
             "command": "uv",
             "args": [
                 "--directory",
-                "你的实际路径/mcp2tcp",  // 例如: "C:/Users/Administrator/Documents/develop/my-mcp-server/mcp2tcp"
+                "你的实际路径/mcp2mqtt",  // 例如: "C:/Users/Administrator/Documents/develop/my-mcp-server/mcp2mqtt"
                 "run",
-                "mcp2tcp"
+                "mcp2mqtt"
             ]
         }
     }
@@ -266,14 +266,14 @@ commands:
 
 ```bash
 # 克隆代码库
-git clone https://github.com/mcp2everything/mcp2tcp.git
+git clone https://github.com/mcp2everything/mcp2mqtt.git
 ```
 
 2. 创建并激活虚拟环境：
 
 ```bash
 # 进入项目目录
-cd mcp2tcp
+cd mcp2mqtt
 
 # 使用 uv 创建虚拟环境并安装依赖
 uv venv .venv
@@ -289,13 +289,13 @@ uv pip install -r requirements.txt
 
 ```bash
 # 确保在项目根目录下
-cd mcp2tcp
+cd mcp2mqtt
 
 # 激活虚拟环境（如果尚未激活）
 .venv\Scripts\activate
 
 # 运行服务器
-uv run src/mcp2tcp/server.py
+uv run src/mcp2mqtt/server.py
 ```
 
 

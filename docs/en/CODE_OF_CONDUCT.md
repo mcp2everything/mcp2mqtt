@@ -1,6 +1,6 @@
 ### **Community Code of Conduct**  
 
-Thank you for participating in and supporting the **MCP2serial** project! To maintain a healthy and open community, we have established the following code of conduct, which all participants are expected to follow:  
+Thank you for participating in and supporting the **mcp2mqtt** project! To maintain a healthy and open community, we have established the following code of conduct, which all participants are expected to follow:  
 
 #### **1. Respect Others**  
 - Show respect for the opinions, backgrounds, and identities of all community members.  

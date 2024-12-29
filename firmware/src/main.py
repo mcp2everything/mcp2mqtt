@@ -1,9 +1,9 @@
 # ====================================================
-# Project: mcp2tcp
+# Project: mcp2mqtt
 # Description: A protocol conversion tool that enables 
 #              hardware devices to communicate with 
 #              large language models (LLM) through serial ports.
-# Repository: https://github.com/mcp2everything/mcp2tcp.git
+# Repository: https://github.com/mcp2everything/mcp2mqtt.git
 # License: MIT License
 # Author: mcp2everything
 # Copyright (c) 2024 mcp2everything
