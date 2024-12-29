@@ -147,11 +147,10 @@ python3 install_ubuntu.py
 ```
 
 安装脚本会自动完成以下操作：
-- ✅ 检查系统环境
-- ✅ 安装必要的依赖
-- ✅ 创建默认配置文件
-- ✅ 配置Claude桌面版（如果已安装）
-- ✅ 检查串口设备
+- 检查系统环境
+- 安装必要的依赖
+- 创建默认配置文件
+- 配置Claude桌面版（如果已安装）
 
 ### 手动分步安装依赖
 ```bash
@@ -181,8 +180,7 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 > 注意：修改配置后需要重启Cline或者Claude客户端软件
 ## 配置说明
 ### 配置文件位置
-
-配置文件（`config.yaml`）可以放在位置：
+复制配置文件（`config.yaml`）可以放在位置：
 用户主目录（推荐个人使用）
 ```bash
 # Windows系统
@@ -203,25 +201,7 @@ C:\Users\用户名\.mcp2mqtt\config.yaml
   # macOS/Linux系统
   mkdir -p ~/.mcp2mqtt
   ```
-
-### 串口配置 命令配置进阶
-在 `config.yaml` 中添加自定义命令：
-
-
-
-commands:
-  # PWM控制命令
-  set_pwm:
-    command: "CMD_PWM {frequency}"  # 实际发送的命令格式，server会自动添加\r\n
-    need_parse: false  # 不需要解析响应内容
-    prompts:
-      - "把PWM调到最大"
-      - "把PWM调到最小"
-      - "请将PWM设置为{value}"
-      - "关闭PWM"
-      - "把PWM调到一半"
-```
-
+ 
 指定配置文件：
 比如指定加载Pico配置文件：Pico_config.yaml
 ```json
@@ -238,7 +218,7 @@ commands:
     }
 }
 ```
-为了能使用多个串口，我们可以新增多个mcp2mqtt的服务 指定不同的配置文件名即可。
+为了能使用多个mqtt，我们可以新增多个mcp2mqtt的服务 指定不同的配置文件名即可。
 如果要接入多个设备，如有要连接第二个设备：
 指定加载Pico2配置文件：Pico2_config.yaml
 ```json
@@ -257,30 +237,30 @@ commands:
 ```
 
 ### 硬件连接
+1. 将你的设备通过网络连接到mqtt服务器
+2. 也可以用tests目录下的responder.py来模拟设备
 
-1. 将你的设备通过USB连接到电脑
-2. 打开设备管理器，记下设备的COM端口号
-3. 在`config.yaml`中配置正确的端口号和波特率
+## 运行测试
 
-<div align="center">
-    <img src="docs/images/conn
-ect.jpg" alt="硬件连接示例" width="600"/>
-    <p>硬件连接和COM端口配置</p>
-</div>
+### 启动设备模拟器
+
+项目在 `tests` 目录中包含了一个设备模拟器。它可以模拟一个硬件设备，能够：
+- 响应 PWM 控制命令
+- 提供设备信息
+- 控制 LED 状态
+
+启动模拟器：
+```bash
+python tests/responder.py
+```
+
+你应该能看到模拟器正在运行并已连接到 MQTT 服务器的输出信息。
 
 ### 启动客户端Claude 桌面版或Cline
-
-<div align="center">
-    <img src="docs/images/pwm.png" alt="Cline Configuration Example" width="600"/>
-    <p> Example in Claude</p>
-</div>
 <div align="center">
     <img src="docs/images/test_output.png" alt="Cline Configuration Example" width="600"/>
     <p>Example in Cline</p>
 </div>
-
-### 硬件编程
-firmware可以在项目仓库中下载，目前演示的是Pico的micropython代码案例。另存到Pico开发板运行即可。
 
 ### 从源码快速开始
 1. 从源码安装
@@ -302,41 +282,7 @@ source .venv/bin/activate
 uv pip install --editable .
 ```
 
-2. 配置串口和命令：
-默认不使用真实串口 用模拟串口来演示
-如果你的电脑没有串口或者目前没有串口可用
-可以将port参数设置为LOOP_BACK，这样就可以在命令行直接发送命令了
-但同时请修改应答OK的命令的起始符需要和发送的命令一样。
-比如发送LED_ON
-那么应答起始符也是LED_ON
-```yaml
-commands:
-  # PWM控制命令
-  set_pwm:
-    command: "CMD_PWM {frequency}"  # 实际发送的命令格式，server会自动添加\r\n
-    need_parse: false  # 不需要解析响应内容
-    prompts:
-      - "把PWM调到最大"
-      - "把PWM调到最小"
-      - "请将PWM设置为{value}"
-      - "关闭PWM"
-      - "把PWM调到一半"
-```
-
-如果使用真实串口
-```yaml
-commands:
-  set_pwm:
-    command: "PWM {frequency}\n"
-    need_parse: false
-    prompts:
-      - "把PWM调到{value}"
-```
-
-
-
 ### MCP客户端配置
-
 在使用支持MCP协议的客户端（如Claude Desktop或Cline）时，需要在客户端的配置文件中添加以下内容：
 直接自动安装的配置方式
 源码开发的配置方式
@@ -374,9 +320,12 @@ commands:
     }
 }
 ```
+<div align="center">
+    <img src="docs/images/config.png" alt="Cline Configuration Example" width="600"/>
+    <p>Example in Cline</p>
+</div>
 ### 配置文件位置
 配置文件（`config.yaml`）可以放在不同位置，程序会按以下顺序查找：
-
 #### 1. 当前工作目录（适合开发测试）
 - 路径：`./config.yaml`
 - 示例：如果你在 `C:\Projects` 运行程序，它会查找 `C:\Projects\config.yaml`
