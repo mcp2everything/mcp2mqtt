@@ -1,5 +1,7 @@
 # mcp2mqtt: 连接物理世界与AI大模型的桥梁 
 
+<a href="https://glama.ai/mcp/servers/bunlaxlfyz"><img width="380" height="200" src="https://glama.ai/mcp/servers/bunlaxlfyz/badge" alt="mcp2mqtt MCP server" /></a>
+
 [English](README_EN.md) | 简体中文
 
 <div align="center">
