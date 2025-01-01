@@ -1,5 +1,7 @@
 # mcp2mqtt: 连接物理世界与AI大模型的桥梁 
 
+[![smithery badge](https://smithery.ai/badge/mcp2mqtt)](https://smithery.ai/server/mcp2mqtt)
+
 [English](README_EN.md) | 简体中文
 
 <div align="center">
@@ -122,6 +124,14 @@ mcp2mqtt 支持所有实现了 MCP 协议的客户端，以及支持MQTT协议�
 ## 快速开始
 
 ### 1. 安装
+
+### Installing via Smithery
+
+To install mcp2mqtt for Claude Desktop automatically via [Smithery](https://smithery.ai/server/mcp2mqtt):
+
+```bash
+npx -y @smithery/cli install mcp2mqtt --client claude
+```
 
 #### Windows用户
 下载 [install.py](https://raw.githubusercontent.com/mcp2everything/mcp2mqtt/main/install.py) 
