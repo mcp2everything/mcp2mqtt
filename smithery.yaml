@@ -1,0 +1,55 @@
+# Smithery configuration file: https://smithery.ai/docs/config#smitheryyaml
+
+startCommand:
+  type: stdio
+  configSchema:
+    # JSON Schema defining the configuration options for the MCP.
+    type: object
+    required:
+      - broker
+      - port
+      - clientId
+      - username
+      - password
+      - keepalive
+      - topics
+    properties:
+      broker:
+        type: string
+        description: The MQTT server address.
+      port:
+        type: number
+        description: The MQTT server port.
+      clientId:
+        type: string
+        description: The MQTT client ID.
+      username:
+        type: string
+        description: The MQTT username.
+      password:
+        type: string
+        description: The MQTT password.
+      keepalive:
+        type: number
+        description: The MQTT keepalive duration.
+      topics:
+        type: object
+        properties:
+          command:
+            type: object
+            properties:
+              publish:
+                type: string
+              subscribe:
+                type: string
+          status:
+            type: object
+            properties:
+              publish:
+                type: string
+              subscribe:
+                type: string
+  commandFunction:
+    # A function that produces the CLI command to start the MCP on stdio.
+    |-
+    config => ({ command: 'uv', args: ['run', 'src/mcp2mqtt/server.py'], env: { MQTT_BROKER: config.broker, MQTT_PORT: String(config.port), MQTT_CLIENT_ID: config.clientId, MQTT_USERNAME: config.username, MQTT_PASSWORD: config.password, MQTT_KEEPALIVE: String(config.keepalive) } })
